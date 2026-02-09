@@ -28,6 +28,12 @@ const pokemonSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    sound: {
+        type: String,
+        default: function() {
+            return `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${this.id}.ogg`;
+        }
+    },
 });
 
 //  pokemon est le nom de la collection dans la base de données MongoDB. il y aura une collection nommée "pokemons"
