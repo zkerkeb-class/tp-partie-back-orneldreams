@@ -14,6 +14,9 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Trust proxy (needed for Railway/production proxies)
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -32,6 +35,12 @@ const allowedOrigins = (process.env.CORS_ORIGINS || '')
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin) return callback(null, true);
+        
+        // Si CORS_ORIGINS contient '*', autoriser tout
+        if (allowedOrigins.includes('*')) {
+            return callback(null, true);
+        }
+        
         const isLocalhost = origin.startsWith('http://localhost:');
         const isAllowed = allowedOrigins.includes(origin);
         if (isLocalhost || origin === 'http://localhost:3000' || isAllowed) {
@@ -230,6 +239,8 @@ app.delete('/pokemons/:id', [
     }
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
